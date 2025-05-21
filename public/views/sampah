@@ -1,0 +1,41 @@
+<div class="row">
+    
+      <div class="col-4">
+        <div id="cumis"  onclick="select(this.id,1)" class="shadow customcard cumis">
+          <div class="mycard">Cumis</div>
+        </div>
+      </div>
+
+      <div class="col-4">
+        <div id="pat"  onclick="select(this.id,2)" class="shadow customcard pat">
+          <div class="mycard">Patrick</div>
+        </div>
+      </div>
+      <div class="col-4">
+        <div id="kaesar"  onclick="select(this.id,3)" class="shadow customcard cumis">
+          <div class="mycard">Kaesar</div>
+        </div>
+      </div>
+
+</div>
+
+<div class="row mt-4">
+    
+  <div class="col-4">
+    <div id="bot"  onclick="select(this.id,4)" class="shadow customcard cumis">
+      <div class="mycard">Bot Tolol</div>
+    </div>
+  </div>
+
+  <div class="col-4">
+    <div  id="god"  onclick="select(this.id,6)" class="shadow customcard sukuna">
+      <div class="mycard">GOD IMBA</div>
+    </div>
+  </div>
+  <div class="col-4">
+    <div id="riggo" onclick="select(this.id,5)" class="shadow customcard riggo">
+      <div class="mycard">Riggo</div>
+    </div>
+  </div>
+
+</div>

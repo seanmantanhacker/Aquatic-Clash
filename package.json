@@ -1,0 +1,16 @@
+{
+  "name": "aquaticclash",
+  "version": "1.0.0",
+  "description": "perang air galon",
+  "main": "main.js",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aquaticclash": "file:",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1"
+  }
+}
