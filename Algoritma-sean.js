@@ -245,9 +245,59 @@ function algoritmaSeanlvl7(array_now){
         waterAmount = hasil.text[0].difference_amount     
     }
     
-   return {index:gallonIndex,
-    amount: waterAmount //akan mengurangi jumlah air sebanyak -waterAmount-
-   }
+    return {index:gallonIndex,
+     amount: waterAmount //akan mengurangi jumlah air sebanyak -waterAmount-
+    }
 }
 
-module.exports = { algoritmaSean,algoritmaSeanlvl7 }
+/**
+ * Level 8 - Impossible Nim God Algorithm
+ * Uses Charles Bouton's mathematical XOR-sum theorem.
+ * If Nim-Sum != 0, forces a transition to Nim-Sum = 0 (an absolute winning state).
+ * If Nim-Sum == 0, plays a stalling move (reduces 1 from the largest pile).
+ */
+function algoritmaNimSumOptimal(array_now) {
+    const piles = array_now.map(Number);
+    const nimSum = piles.reduce((acc, val) => acc ^ val, 0);
+
+    let chosenIndex = -1;
+    let waterAmount = 0;
+
+    if (nimSum !== 0) {
+        // Winning position! Find a pile where reducing it makes XOR-sum == 0
+        for (let i = 0; i < piles.length; i++) {
+            const target = piles[i] ^ nimSum;
+            if (target < piles[i]) {
+                chosenIndex = i;
+                waterAmount = piles[i] - target;
+                break;
+            }
+        }
+    }
+
+    // Defensive fallback if currently in P-position (nimSum == 0)
+    if (chosenIndex === -1 || waterAmount <= 0) {
+        const availableGallons = piles
+            .map((g, index) => (g > 0 ? index : null))
+            .filter(index => index !== null);
+        
+        if (availableGallons.length > 0) {
+            // Take 1 liter from the largest pile to prolong the game and induce player error
+            chosenIndex = availableGallons.reduce((maxIdx, currIdx) => {
+                return piles[currIdx] > piles[maxIdx] ? currIdx : maxIdx;
+            }, availableGallons[0]);
+            waterAmount = 1;
+        } else {
+            chosenIndex = 0;
+            waterAmount = 0;
+        }
+    }
+
+    return {
+        index: chosenIndex,
+        amount: waterAmount,
+        nimSum: nimSum
+    };
+}
+
+module.exports = { algoritmaSean, algoritmaSeanlvl7, algoritmaNimSumOptimal }

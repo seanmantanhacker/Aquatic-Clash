@@ -1,409 +1,572 @@
-
+<!DOCTYPE html>
 <html lang="en" translate="no">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aquatic Clash V1.0</title>
+  <title>Aquatic Clash - Battle Arena</title>
+  <link rel="icon" href="/image/bebe.jpg" type="image/x-icon">
   
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="/style-game.css">
 
-  <link rel="icon" href="/image/bebe.jpg" type="image/x-icon">
-  <audio id="background-audio" src="/bgm/sukuna_ost.mp3" autoplay></audio>
-  <audio id="background-audio2" src="/bgm/sukuna_gambare_gambare.wav"></audio>
-  
+  <audio id="bgmSukuna" src="/bgm/sukuna_ost.mp3" loop></audio>
+  <audio id="sfxVoice" src="/bgm/sukuna_gambare_gambare.wav"></audio>
 </head>
 <body>
 
-  <!-- Bootstrap Container -->
- 
-  <div class="container-fluid"> 
-      <div class="row">
-        <div class="col-2">
-          <img src="/image/orang.png" class="customimage" id="image-1" alt="Italian Trulli">
+  <div class="game-container">
+    <!-- Top Navigation -->
+    <nav class="game-nav">
+      <a href="/" class="nav-link-btn">
+        <i class="fa-solid fa-arrow-left"></i> Menu Utama
+      </a>
+      <div class="nav-actions">
+        <button class="icon-btn" id="audioBtn" title="Toggle Music" onclick="toggleAudio()">
+          <i class="fa-solid fa-volume-high" id="audioIcon"></i>
+        </button>
       </div>
-        <div class="col-8">
-            <h1>Welcome to Aquatic Clash (lvl <%-lvl%>) </h1>
-            <h2 id="turn">Player Turn</h2>
+    </nav>
+
+    <!-- Battle HUD Header -->
+    <section class="battle-hud">
+      <div class="hud-grid">
+        <!-- Player Avatar -->
+        <div class="fighter-slot">
+          <div class="fighter-avatar active-turn" id="playerAvatarBox">
+            <img src="/image/orang.png" alt="Player">
+          </div>
+          <span class="fighter-label" style="color: var(--cyan-neon);">YOU</span>
         </div>
-        <div class="col-2">
-          <img src="<%=enemy%>" class="customimage d-none" id="image-2" alt="Italian Trulli">
+
+        <!-- Center Battle Status -->
+        <div class="hud-center">
+          <div class="hud-level-badge" id="levelBadge">LEVEL <%-lvl%></div>
+          <div class="hud-turn-title turn-player" id="turnTitle">GILIRAN ANDA</div>
+          <div class="hud-dialogue" id="dialogueText">Pilih salah satu ember di bawah dan kurangi airnya.</div>
+        </div>
+
+        <!-- Enemy Avatar -->
+        <div class="fighter-slot">
+          <div class="fighter-avatar" id="enemyAvatarBox">
+            <img src="<%=enemy%>" alt="Enemy" id="enemyImg">
+          </div>
+          <span class="fighter-label" style="color: var(--pink-neon);" id="enemyNameTag">ENEMY</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallons / Ember Arena (3 Buckets) -->
+    <section class="gallons-grid">
+      <!-- Gallon 1 -->
+      <div class="gallon-card selected" id="cardEmber1" onclick="selectGallon(0)">
+        <div class="gallon-badge">EMBER 1</div>
+        <div class="gallon-icon">
+          <img src="/image/ember.png" alt="Ember 1">
+        </div>
+        <div class="gallon-amount" id="ember1">0</div>
+        <div class="gallon-unit">Liter</div>
+        <div class="water-gauge-container">
+          <div class="water-gauge-fill" id="gauge1" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <!-- Gallon 2 -->
+      <div class="gallon-card" id="cardEmber2" onclick="selectGallon(1)">
+        <div class="gallon-badge">EMBER 2</div>
+        <div class="gallon-icon">
+          <img src="/image/ember.png" alt="Ember 2">
+        </div>
+        <div class="gallon-amount" id="ember2">0</div>
+        <div class="gallon-unit">Liter</div>
+        <div class="water-gauge-container">
+          <div class="water-gauge-fill" id="gauge2" style="width: 100%;"></div>
+        </div>
+      </div>
+
+      <!-- Gallon 3 -->
+      <div class="gallon-card" id="cardEmber3" onclick="selectGallon(2)">
+        <div class="gallon-badge">EMBER 3</div>
+        <div class="gallon-icon">
+          <img src="/image/ember.png" alt="Ember 3">
+        </div>
+        <div class="gallon-amount" id="ember3">0</div>
+        <div class="gallon-unit">Liter</div>
+        <div class="water-gauge-container">
+          <div class="water-gauge-fill" id="gauge3" style="width: 100%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Control Panel -->
+    <section class="control-panel">
+      <div class="selected-gallon-indicator">
+        <div class="indicator-title">
+          <i class="fa-solid fa-hand-pointer text-cyan"></i> Target Terpilih
+        </div>
+        <div class="indicator-val" id="targetIndicator">Ember 1 (0 L Tersedia)</div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="quick-buttons">
+        <button class="quick-btn" type="button" onclick="setReduction(1)">-1 L</button>
+        <button class="quick-btn" type="button" onclick="setReduction(5)">-5 L</button>
+        <button class="quick-btn" type="button" onclick="setReductionPercent(0.5)">50%</button>
+        <button class="quick-btn" type="button" onclick="setReductionAll()">Habiskan</button>
+      </div>
+
+      <!-- Input and Execute Button -->
+      <div class="input-row">
+        <input id="reductionInput" class="input-cyber" type="number" min="1" placeholder="Jumlah liter..." />
+        <button id="submitBtn" class="btn-execute" onclick="submitMove()">
+          <i class="fa-solid fa-droplet"></i> Ambil Air
+        </button>
+      </div>
+    </section>
+
+    <!-- Notification Toast Container -->
+    <div class="alert-container">
+      <div class="cyber-alert cyber-alert-danger d-none" id="alertBox"></div>
+      <div class="cyber-alert cyber-alert-success d-none" id="successBox"></div>
+    </div>
+  </div>
+
+  <!-- Victory / Defeat Modal -->
+  <div class="modal fade" id="resultModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="resultModalTitle">Hasil Pertandingan</h5>
+        </div>
+        <div class="modal-body" id="resultModalBody">
+          <!-- Dynamically filled -->
+        </div>
+        <div class="modal-footer">
+          <a href="/" class="btn-cyber-secondary" style="text-decoration:none;">Pilih Lawan Lain</a>
+          <button type="button" class="btn-cyber-primary" onclick="restartMatch()">Tanding Ulang</button>
+        </div>
       </div>
     </div>
-
-    <div class="row">
-      <div class="col-md-12">
-        
-      </div>
-  </div>
-   
-  <div class="row">
-    
-      <div class="col-4">
-        <div id="cumis" class="shadow customcard ember">
-          <div id="ember1" class="mycard">00</div>
-        </div>
-      </div>
-
-      <div class="col-4">
-        <div id="pat" class="shadow customcard ember">
-          <div id="ember2" class="mycard">00</div>
-        </div>
-      </div>
-      <div class="col-4">
-        <div id="kaesar" class="shadow customcard ember">
-          <div id="ember3" class="mycard">00</div>
-        </div>
-      </div>
-
-</div>
-
-<div class="row">
-  <h2 id="info">masukan jumlah air yang ingin dikurang </h2>
-</div>
-
-<div class="row">
-    
-  <div class="col-4">
-    
-    <input id="input1" type="number">
   </div>
 
-  <div class="col-4">
-    <input id="input2" type="number">
-  </div>
-  <div class="col-4">
-    <input id="input3" type="number">
-  </div>
+  <!-- jQuery & Bootstrap -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-</div>
+  <script>
+    const level = parseInt("<%-lvl%>") || 1;
+    const bgmAudio = document.getElementById('bgmSukuna');
+    const sfxVoice = document.getElementById('sfxVoice');
+    const audioIcon = document.getElementById('audioIcon');
+    let isMuted = false;
 
-<div class="row">
-    
-  <button id="submit" class="button-40" onclick="submit()" role="button">Ambil</button>
-  <div class="alert alert-danger d-none" id="addItemAlert" role="alert">
-    alert
-  </div>
-  <div class="alert alert-success d-none" id="addsucAlert" role="alert">
-    alert
-  </div>
-</div>
+    let gallons = [0, 0, 0];
+    let maxGallons = [0, 0, 0];
+    let selectedGallonIndex = 0;
+    let isPlayerTurn = true;
+    let dialogueInterval = null;
 
-  </div>
+    const resultModal = new bootstrap.Modal(document.getElementById('resultModal'), {
+      backdrop: 'static',
+      keyboard: false
+    });
 
-  <!-- jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    // Enemy names list
+    const enemyNames = {
+      1: "Cumis",
+      2: "Patrick Star",
+      3: "Bot Tolol",
+      4: "Riggo Star",
+      5: "Ryomen Sukuna",
+      6: "Asauchi",
+      7: "Master MIND",
+      8: "NIM-OS OVERLORD"
+    };
 
-  <!-- Bootstrap Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-  
-</body>
-
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-</html>
-
-<script>
-  function wordevery5sec() {
-    console.log("aa")
-    kalimat = {
-      1 : "Kamu butuh latihan 1000 tahun untuk mengalahkanku",
-      2 : "HaHaHaHaaaa Tampaknya kamu akan kalah",
-      3 : "Terlalu Mudah Bagiku kawan",
-      4 : "Hanya segini saja kemampuanmu ?",
-      5 : "Kita akhiri saja dengan cepat",
-      6 : "Hebat Juga gerakanmu, patut diberikan sekotak sampah",
-      7 : "Masukan Jumlah Air yang Ingin Dikurangi",
+    // Apply boss themes
+    if (level === 7) {
+      document.body.classList.add('level-7');
+    } else if (level === 8) {
+      document.body.classList.add('level-8');
+      document.getElementById('levelBadge').style.borderColor = 'var(--purple-neon)';
+      document.getElementById('levelBadge').style.color = 'var(--purple-neon)';
+      document.getElementById('levelBadge').textContent = 'LEVEL 8 (IMPOSSIBLE)';
     }
-    random = Math.floor(Math.random() * 7) + 1;
-    $("#info").text(kalimat[random])
-  }
 
-  const audio2 = document.getElementById('background-audio2');
-  const audio = document.getElementById('background-audio');
-  level = <%-lvl%>;
-  if (level == 7){
-    document.body.style.backgroundImage = 'url("/image/bg7.png")';
-    $(".mycard").addClass("white")
-    $("#turn").addClass("white")
-    $("#info").addClass("white")
-    // Delay the first execution by 1 second
-    setTimeout(() => {
-        wordevery5sec(); // Execute after 1 second
-        setInterval(wordevery5sec, 10000);
-    }, 20000);
-  
-  }
+    // Set enemy name tag
+    document.getElementById('enemyNameTag').textContent = (enemyNames[level] || `BOT LVL ${level}`).toUpperCase();
 
-  if (level < 6){
-    audio.pause()
-  }
-  let gallons = []
-  const myModal = new bootstrap.Modal('#staticBackdrop', {
-    keyboard: false
-  })
-  $('#staticBackdrop').on('hidden.bs.modal', function () {
-    window.location.href = "/"
-  })
+    // Start background audio if level >= 5
+    if (level >= 5) {
+      bgmAudio.volume = 0.25;
+      bgmAudio.play().catch(() => {
+        // Autoplay policy prevented immediate playback; wait for user interaction
+      });
+    }
 
-  
- // Inisialisasi permainan
-function initializeGame() {  
-
-  audio.volume = 0.3; // 50% volume   
-  if (level > 6){
-    gallon2= Math.floor(Math.random() * (30 - 15 + 1)) + 15;
-    do {
-      gallon1=  Math.floor(Math.random() * (99 - 35 + 1)) + 35;
-      gallon3= Math.floor(Math.random() * (99 - 35 + 1)) + 35;
-    } while (Math.abs( gallon1 -  gallon3) < 6); // Ensure b and c differ by at least 6
-
-  } else if (level == 6) {  
-    gallon1=  Math.floor(Math.random() * 90) + 7,
-    gallon2=  Math.floor(Math.random() * 80) + 6,
-    gallon3=  Math.floor(Math.random() * 50) + 7
-  } else {
-    gallon1=  Math.floor(Math.random() * 40) + 1,
-    gallon2=  Math.floor(Math.random() * 50) + 1,
-    gallon3=  Math.floor(Math.random() * 60) + 1
-  }
-  
-  $("#ember1").text(gallon1)
-  $("#ember2").text(gallon2)
-  $("#ember3").text(gallon3)
-
-  gallons=[gallon1,gallon2,gallon3]
-
-}
-
-function startGame(level) {   
-  playerTurn(level);
-}
-
-function addAlert(text){
-  $("#addItemAlert").text(text)
-  $("#addItemAlert").removeClass("d-none")
-    setTimeout(function(){
-        $("#addItemAlert").addClass("show")
-    },200)
-
-    setTimeout(function(){
-        $("#addItemAlert").removeClass("show")
-        
-        setTimeout(function(){
-          $("#addItemAlert").addClass("d-none")
-        },200)
-    },3000)
-}
-
-function sucAlert(text){
-  $("#addsucAlert").text(text)
-  $("#addsucAlert").removeClass("d-none")
-    setTimeout(function(){
-        $("#addsucAlert").addClass("show")
-    },200)
-
-    setTimeout(function(){
-        $("#addsucAlert").removeClass("show")
-        
-        setTimeout(function(){
-          $("#addsucAlert").addClass("d-none")
-        },200)
-    },3000)
-}
-
-function submit(){
-  
-  input1 = $("#input1").val()
-  input2 = $("#input2").val()
-  input3 = $("#input3").val()
- amount = 0
- index = 0
-
- if (input1 == '' && input2 == '' && input3 == ''){
-  addAlert("input tidak boleh kosong")
-  return;
- } else {
-  if (input1 >0){
-    amount = parseInt(input1)
-    index = 0
-  } else if (input2 > 0){
-    amount = parseInt(input2)
-    index = 1
-  } else if (input3 > 0){
-    amount = parseInt(input3)
-    index = 2
-  }
-
-  if (amount == 0){
-    addAlert("pengurangan air tidak boleh 0")
-    return
-  }
-
- }
- if (gallons[index] > 0) {
-      // Syarat: Input tidak boleh sama dengan nilai galon
-      if (amount <= gallons[index]) {
-          gallons[index] = parseInt(gallons[index]) - parseInt(amount) ; // Mengubah air dalam galon
-          text = `Galon ${index + 1} diubah menjadi ${gallons[index]}.`
-          sucAlert(text)
-          no = `#ember${index+1}`
-          
-          $(no).text(gallons[index])
-          
-          $("#input2").val("")
-          $("#input1").val("")
-          $("#input3").val("")
-          availableGallons = gallons
-          .map((g, index) => (g > 0 ? index : null))
-          .filter(index => index !== null);
-
-          if (availableGallons.length === 0) {
-            
-            sucAlert("Semua galon kosong PLAYER menang")
-            $(".modal-body").text("CONGRATULATIONS YOU WIN")
-            myModal.show()
-            return;
-          }
-          computerTurn(level);  // Giliran komputer
+    function toggleAudio() {
+      if (isMuted) {
+        bgmAudio.volume = 0.25;
+        bgmAudio.play().catch(() => {});
+        audioIcon.className = 'fa-solid fa-volume-high';
+        isMuted = false;
       } else {
-        addAlert("Syarat tidak terpenuhi! Pastikan mengurangi air yang valid! Silakan pilih ulang.")
-        return
+        bgmAudio.pause();
+        audioIcon.className = 'fa-solid fa-volume-xmark';
+        isMuted = true;
       }
-  } else {
-    addAlert("Galon sudah kosong! Silakan pilih galon lain.")
-    return
-  }
-
-}
-
-function playerTurn(level) {
-    // Pemain A memasukkan input dalam bentuk [nilai, galon]
-    if (level ==6){
-      audio2.play()
-  }
-    
-    $("#image-2").addClass("d-none")
-    $("#image-1").removeClass("d-none")
-    document.getElementById("submit").disabled = false;
-    $("#turn").text("Player turn")
-   
-}
-
-function computerTurn(level) {
-  $("#image-1").addClass("d-none")
-  $("#image-2").removeClass("d-none")
-  document.getElementById("submit").disabled = true;
-  $("#turn").text("Computer turn")
-    // Komputer memilih galon yang berisi air
-
-    let gallonIndex;
-    if (level === 1) {
-        // Strategi termudah: Komputer memilih galon acak
-        gallonIndex = availableGallons[Math.floor(Math.random() * availableGallons.length)];
-    } else if (level <= 4) {
-        // Strategi menengah hingga sulit: Komputer memilih galon dengan air maksimum
-        gallonIndex = availableGallons.reduce((maxIndex, currentIndex) => {
-            return gallons[currentIndex] > gallons[maxIndex] ? currentIndex : maxIndex;
-        }, availableGallons[0]);
-    } else if (level == 5) {
-        // Level 5: Strategi hampir mustahil, memilih galon yang menyisakan sedikit air
-        gallonIndex = availableGallons.reduce((minIndex, currentIndex) => {
-            return gallons[currentIndex] < gallons[minIndex] ? currentIndex : minIndex;
-        }, availableGallons[0]);
-    } else if (level == 6) {
-        // Level 6: Strategi hampir mustahil, memilih galon dengan Algoritma Sean
-      
-        // hasil = algoritmaSean(gallons)
-        $.ajax({
-            url: '/api/get-data-by-algoritma-master',
-            method: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data:JSON.stringify(gallons) ,
-            success: function(response){
-                 
-                 gallonIndex = response.index
-                waterAmount = response.amount
-                gallons[gallonIndex] -= waterAmount;
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-              
-            }
-         })
-
-    } else if (level == 7) {
-        // Level 7: Strategi hampir mustahil, memilih galon dengan Algoritma Sean
-      
-        // hasil = algoritmaSean(gallons)
-        $.ajax({
-            url: '/api/get-data-by-algoritma-master-lvl7',
-            method: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data:JSON.stringify(gallons) ,
-            success: function(response){
-                 
-                 gallonIndex = response.index
-                waterAmount = response.amount
-                gallons[gallonIndex] -= waterAmount;
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-              
-            }
-         })
-
     }
 
-    if (level < 6){
-        // Komputer mengurangi air dari galon yang dipilih
-        waterAmount = Math.floor(Math.random() * gallons[gallonIndex]) + 1; // Mengurangi setidaknya 1 liter
-        gallons[gallonIndex] -= waterAmount;
+    // Intimidation Dialogue
+    function triggerBossDialogue() {
+      let lines = [];
+      if (level === 8) {
+        lines = [
+          "Kalkulasi nunchi: Posisi kemenangan mutlak berada di pihakku.",
+          "Setiap tetes air yang kamu kurangi hanya mempercepat kekalahanmu.",
+          "Bouton's Theorem telah membuktikan: tidak ada jalan keluar bagimu.",
+          "Status P-Position terkunci sempurna. Langkahmu sia-sia.",
+          "Peluang menangmu tetap 0.0000%."
+        ];
+      } else if (level === 7) {
+        lines = [
+          "Kamu butuh latihan 1000 tahun untuk mengalahkanku.",
+          "HaHaHa! Tampaknya kamu akan kalah dalam beberapa langkah.",
+          "Terlalu mudah bagiku, kawan.",
+          "Hanya segini kemampuanmu?",
+          "Kita akhiri ini dengan cepat."
+        ];
+      }
+
+      if (lines.length > 0) {
+        const randLine = lines[Math.floor(Math.random() * lines.length)];
+        $('#dialogueText').text(`"${randLine}"`);
+      }
     }
-    
-    // Delay 3 detik sebelum menampilkan hasil komputer
-    setTimeout(() => {
-        
-        sucAlert(`Komputer mengurangi galon ${gallonIndex + 1} sebanyak ${waterAmount} liter`)
 
-        no = `#ember${gallonIndex+1}`
-        $(no).text(gallons[gallonIndex])
+    // Initialise Game values
+    function initializeGame() {
+      if (level === 8) {
+        // Level 8 (Impossible): Starting state locked to Nim-Sum == 0
+        // Since player moves first, this mathematically forces the player into a losing position (P-position).
+        // Numbers are <= 40, distinct, and randomized without obvious patterns.
+        let g1, g2, g3;
+        do {
+          g1 = Math.floor(Math.random() * 32) + 8; // 8 .. 39
+          g2 = Math.floor(Math.random() * 32) + 8; // 8 .. 39
+          g3 = g1 ^ g2;
+        } while (
+          g3 < 5 || 
+          g3 > 40 || 
+          g1 === g2 || 
+          g2 === g3 || 
+          g1 === g3
+        );
 
-        // Periksa apakah semua galon kosong setelah turn komputer
-        if (gallons.every(g => g <= 0)) {
-            addAlert('Semua galon kosong! Komputer menang.')
-            $(".modal-body").text("YOU LOSE")
-            myModal.show()
-            return
+        // Randomly shuffle array order so the XOR relation isn't tied to any fixed bucket index
+        gallons = [g1, g2, g3].sort(() => Math.random() - 0.5);
+      } else if (level === 7) {
+        let g1, g2, g3;
+        g2 = Math.floor(Math.random() * 16) + 15;
+        do {
+          g1 = Math.floor(Math.random() * 65) + 35;
+          g3 = Math.floor(Math.random() * 65) + 35;
+        } while (Math.abs(g1 - g3) < 6);
+        gallons = [g1, g2, g3];
+      } else if (level === 6) {
+        gallons = [
+          Math.floor(Math.random() * 90) + 7,
+          Math.floor(Math.random() * 80) + 6,
+          Math.floor(Math.random() * 50) + 7
+        ];
+      } else {
+        gallons = [
+          Math.floor(Math.random() * 40) + 5,
+          Math.floor(Math.random() * 50) + 5,
+          Math.floor(Math.random() * 60) + 5
+        ];
+      }
+
+      maxGallons = [...gallons];
+      updateUI();
+      selectGallon(0);
+
+      if (level >= 7) {
+        dialogueInterval = setInterval(triggerBossDialogue, 8000);
+      }
+    }
+
+    function selectGallon(index) {
+      if (!isPlayerTurn) return;
+      if (gallons[index] <= 0) {
+        showAlert(`Ember ${index + 1} sudah kosong! Silakan pilih ember lain.`);
+        return;
+      }
+
+      selectedGallonIndex = index;
+      $('.gallon-card').removeClass('selected');
+      $(`#cardEmber${index + 1}`).addClass('selected');
+
+      $('#targetIndicator').text(`Ember ${index + 1} (${gallons[index]} L Tersedia)`);
+      $('#reductionInput').val('');
+      $('#reductionInput').focus();
+    }
+
+    function setReduction(amount) {
+      if (!isPlayerTurn) return;
+      const current = gallons[selectedGallonIndex];
+      const target = Math.min(amount, current);
+      $('#reductionInput').val(target);
+    }
+
+    function setReductionPercent(pct) {
+      if (!isPlayerTurn) return;
+      const current = gallons[selectedGallonIndex];
+      const target = Math.max(1, Math.floor(current * pct));
+      $('#reductionInput').val(target);
+    }
+
+    function setReductionAll() {
+      if (!isPlayerTurn) return;
+      $('#reductionInput').val(gallons[selectedGallonIndex]);
+    }
+
+    function updateUI() {
+      for (let i = 0; i < 3; i++) {
+        $(`#ember${i + 1}`).text(gallons[i]);
+        const pct = maxGallons[i] > 0 ? Math.max(0, (gallons[i] / maxGallons[i]) * 100) : 0;
+        $(`#gauge${i + 1}`).css('width', `${pct}%`);
+
+        if (gallons[i] <= 0) {
+          $(`#cardEmber${i + 1}`).addClass('empty');
         } else {
-          
-            playerTurn(level);  // Giliran pemain lagi
+          $(`#cardEmber${i + 1}`).removeClass('empty');
         }
-    }, 5000); // Delay 5000 ms (5 detik)
-}
+      }
 
-// A $( document ).ready() block.
-$( document ).ready(function() {
-  level = <%-lvl%>
-  initializeGame()
-  startGame(level)
-});
+      const curVal = gallons[selectedGallonIndex];
+      if (curVal > 0) {
+        $('#targetIndicator').text(`Ember ${selectedGallonIndex + 1} (${curVal} L Tersedia)`);
+      } else {
+        // Auto-switch to next available gallon
+        const nextAvail = gallons.findIndex(g => g > 0);
+        if (nextAvail !== -1) {
+          selectGallon(nextAvail);
+        } else {
+          $('#targetIndicator').text("Semua ember telah kosong.");
+        }
+      }
+    }
 
-</script>
+    function showAlert(text) {
+      $('#successBox').addClass('d-none');
+      $('#alertBox').text(text).removeClass('d-none');
+      setTimeout(() => $('#alertBox').addClass('d-none'), 3500);
+    }
+
+    function showSuccess(text) {
+      $('#alertBox').addClass('d-none');
+      $('#successBox').text(text).removeClass('d-none');
+      setTimeout(() => $('#successBox').addClass('d-none'), 3500);
+    }
+
+    function submitMove() {
+      if (!isPlayerTurn) return;
+
+      const inputVal = $('#reductionInput').val().trim();
+      if (!inputVal) {
+        showAlert("Masukkan jumlah air yang ingin dikurangi!");
+        return;
+      }
+
+      const amount = parseInt(inputVal);
+      if (isNaN(amount) || amount <= 0) {
+        showAlert("Jumlah pengurangan air harus lebih dari 0!");
+        return;
+      }
+
+      if (amount > gallons[selectedGallonIndex]) {
+        showAlert(`Air tidak mencukupi! Ember ${selectedGallonIndex + 1} hanya berisi ${gallons[selectedGallonIndex]} liter.`);
+        return;
+      }
+
+      // Execute Player Move
+      gallons[selectedGallonIndex] -= amount;
+      updateUI();
+      showSuccess(`Anda mengambil ${amount} liter dari Ember ${selectedGallonIndex + 1}.`);
+      $('#reductionInput').val('');
+
+      // Check if player won
+      if (gallons.every(g => g <= 0)) {
+        handleGameOver(true);
+        return;
+      }
+
+      // Switch to Computer Turn
+      triggerComputerTurn();
+    }
+
+    function triggerComputerTurn() {
+      isPlayerTurn = false;
+      document.getElementById('submitBtn').disabled = true;
+
+      // Update HUD states
+      $('#playerAvatarBox').removeClass('active-turn');
+      $('#enemyAvatarBox').addClass('enemy-turn');
+      $('#turnTitle').removeClass('turn-player').addClass('turn-enemy').text("GILIRAN KOMPUTER...");
+      $('#dialogueText').text("Komputer sedang menganalisis strategi terbaik...");
+
+      if (level === 6 && !isMuted) {
+        sfxVoice.play().catch(() => {});
+      }
+
+      // Available gallons
+      const availableIndices = gallons
+        .map((g, idx) => (g > 0 ? idx : null))
+        .filter(idx => idx !== null);
+
+      if (availableIndices.length === 0) {
+        handleGameOver(true);
+        return;
+      }
+
+      // Fetch AI Move
+      if (level === 8) {
+        // Level 8: Pure Optimal Nim-Sum API
+        $.ajax({
+          url: '/api/get-data-by-algoritma-master-lvl8',
+          method: 'POST',
+          dataType: 'json',
+          contentType: 'application/json',
+          data: JSON.stringify(gallons),
+          success: function(resp) {
+            executeComputerStep(resp.index, resp.amount);
+          },
+          error: function() {
+            // Fallback in case of network glitch: execute optimal client-side
+            const s = gallons[0] ^ gallons[1] ^ gallons[2];
+            let idx = availableIndices[0];
+            let amt = 1;
+            if (s !== 0) {
+              for (let i = 0; i < 3; i++) {
+                if ((gallons[i] ^ s) < gallons[i]) {
+                  idx = i;
+                  amt = gallons[i] - (gallons[i] ^ s);
+                  break;
+                }
+              }
+            }
+            executeComputerStep(idx, amt);
+          }
+        });
+      } else if (level === 7) {
+        $.ajax({
+          url: '/api/get-data-by-algoritma-master-lvl7',
+          method: 'POST',
+          dataType: 'json',
+          contentType: 'application/json',
+          data: JSON.stringify(gallons),
+          success: function(resp) {
+            executeComputerStep(resp.index, resp.amount);
+          }
+        });
+      } else if (level === 6) {
+        $.ajax({
+          url: '/api/get-data-by-algoritma-master',
+          method: 'POST',
+          dataType: 'json',
+          contentType: 'application/json',
+          data: JSON.stringify(gallons),
+          success: function(resp) {
+            executeComputerStep(resp.index, resp.amount);
+          }
+        });
+      } else {
+        // Levels 1 to 5: Local Logic
+        let targetIdx;
+        if (level === 1) {
+          // Random
+          targetIdx = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+        } else if (level <= 4) {
+          // Pick maximum pile
+          targetIdx = availableIndices.reduce((maxI, curI) => (gallons[curI] > gallons[maxI] ? curI : maxI), availableIndices[0]);
+        } else if (level === 5) {
+          // Pick minimum pile
+          targetIdx = availableIndices.reduce((minI, curI) => (gallons[curI] < gallons[minI] ? curI : minI), availableIndices[0]);
+        }
+
+        const amount = Math.floor(Math.random() * gallons[targetIdx]) + 1;
+        executeComputerStep(targetIdx, amount);
+      }
+    }
+
+    function executeComputerStep(idx, amount) {
+      // Ensure validity
+      const safeIdx = (idx >= 0 && idx < 3 && gallons[idx] > 0) ? idx : gallons.findIndex(g => g > 0);
+      const safeAmount = Math.min(amount || 1, gallons[safeIdx]);
+
+      // Delay for realistic pacing (1.6s)
+      setTimeout(() => {
+        gallons[safeIdx] -= safeAmount;
+        updateUI();
+        showSuccess(`Komputer mengambil ${safeAmount} liter dari Ember ${safeIdx + 1}!`);
+
+        if (gallons.every(g => g <= 0)) {
+          handleGameOver(false);
+          return;
+        }
+
+        // Return turn to player
+        isPlayerTurn = true;
+        document.getElementById('submitBtn').disabled = false;
+        $('#enemyAvatarBox').removeClass('enemy-turn');
+        $('#playerAvatarBox').addClass('active-turn');
+        $('#turnTitle').removeClass('turn-enemy').addClass('turn-player').text("GILIRAN ANDA");
+        $('#dialogueText').text("Pilih ember dan tentukan jumlah air yang ingin dikurangi.");
+      }, 1600);
+    }
+
+    function handleGameOver(playerWon) {
+      if (dialogueInterval) clearInterval(dialogueInterval);
+
+      if (playerWon) {
+        $('#resultModalTitle').text("VICTORY!").css('color', 'var(--cyan-neon)');
+        $('#resultModalBody').html(`
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏆</div>
+          <h3 style="color: var(--cyan-neon); font-weight: 800;">SELAMAT, ANDA MENANG!</h3>
+          <p style="color: var(--text-muted); font-size: 1rem; margin-top: 0.5rem;">
+            Anda berhasil mengambil tetes air terakhir dan mengalahkan ${enemyNames[level] || 'Lawan'}!
+          </p>
+        `);
+      } else {
+        $('#resultModalTitle').text("DEFEAT").css('color', 'var(--danger-neon)');
+        $('#resultModalBody').html(`
+          <div style="font-size: 3rem; margin-bottom: 0.5rem;">💀</div>
+          <h3 style="color: var(--danger-neon); font-weight: 800;">ANDA KALAH!</h3>
+          <p style="color: var(--text-muted); font-size: 1rem; margin-top: 0.5rem;">
+            ${enemyNames[level] || 'Komputer'} telah mengambil tetes air terakhir dan menguasai permainan.
+          </p>
+        `);
+      }
+
+      resultModal.show();
+    }
+
+    function restartMatch() {
+      resultModal.hide();
+      isPlayerTurn = true;
+      document.getElementById('submitBtn').disabled = false;
+      $('#enemyAvatarBox').removeClass('enemy-turn');
+      $('#playerAvatarBox').addClass('active-turn');
+      $('#turnTitle').removeClass('turn-enemy').addClass('turn-player').text("GILIRAN ANDA");
+      $('#dialogueText').text("Pilih salah satu ember di bawah dan kurangi airnya.");
+      initializeGame();
+    }
+
+    $(document).ready(function() {
+      initializeGame();
+    });
+  </script>
+</body>
+</html>

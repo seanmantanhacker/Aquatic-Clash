@@ -1,182 +1,359 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aquatic Clash V1.0</title>
+  <title>Aquatic Clash V1.8 - Nim Game</title>
   <link rel="icon" href="/image/bebe.jpg" type="image/x-icon">
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-  <!-- Bootstrap Container -->
- 
-  <div class="container-fluid">
-
-      <div class="row">
-        <div class="col-md-12">
-            <h1>Welcome to Aquatic Clash</h1>
-        </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12">
-        <canvas id="pixelCanvas" width="64" height="64" style="border:1px solid #000;"></canvas>
-      </div>
-  </div>
-  <script>
-     i = 0
-   const myInterval = setInterval(myTimer, 1000);
-
-function myTimer() {
- 
-  if (i == 0){
-    drawPixelArt("angry")
-    i = 1
-  } else {
-    drawPixelArt("smile")
-    i = 0
-  }
-}
-  </script>
-    <div class="row">
-      <div class="col-md-12 customtext">
-        Choose Your Opponent
-      </div>
-  </div>
-  <div id="carouselExample" class="carousel slide">
-    <div class="carousel-inner">
-      <div class="carousel-item active" id="1">
-        <img src="image/cumis.jpg" class="customcard d-block" alt="...">
-        <div class="customtext">Name : Cumis</div>
-        <div class="customtext">Level : 0</div>
-        <div class="customtext">Probability of winning : 99%</div>
-      </div>
-      <div class="carousel-item" id="2">
-        <img src="image/pat.png" class=" customcard d-block" alt="...">
-        <div class="customtext">Name : Patrick Star</div>
-        <div class="customtext">Level : 1</div>
-        <div class="customtext">Probability of winning : 95%</div>
-      </div>
-      <div class="carousel-item" id="3">
-        <img src="image/bot.jpg" class="customcard d-block" alt="...">
-        <div class="customtext">Name : Bot Tolol</div>
-        <div class="customtext">Level : 2</div>
-        <div class="customtext">Probability of winning : 90%</div>
-      </div>
-      <div class="carousel-item" id="4">
-        <img src="image/bebe.jpg" class="customcard d-block" alt="...">
-        <div class="customtext">Name : Riggo Star</div>
-        <div class="customtext">Level : 3</div>
-        <div class="customtext">Probability of winning : 88%</div>
-      </div>
-      <div class="carousel-item" id="5">
-        <img src="image/sukuna.jpg" class="customcard d-block" alt="...">
-        <div class="customtext">Name : Sukuna</div>
-        <div class="customtext">Level : 4</div>
-        <div class="customtext">Probability of winning : 83%</div>
-      </div>
-      <div class="carousel-item" id="6">
-        <img src="image/sean.jpg" class="customcard d-block" alt="...">
-        <div class="customtext">Name : Asauchi of Kamina-sama</div>
-        <div class="customtext">Level : 99</div>
-        <div class="customtext">Probability of winning : 1%</div>
-      </div>
-      <div class="carousel-item" id="7">
-        <img src="image/devil.png" class="customcard d-block" alt="...">
-        <div class="customtext">Name : Master MIND</div>
-        <div class="customtext">Level : 999</div>
-        <div class="customtext">Probability of winning : 0%</div>
-      </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" ></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-      <span class="carousel-control-next-icon" ></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
-  </div>
-
-  <div class="row mt-4">
-    
-    <div class="col-3">
-    </div>
-    
-    <div class="col-6">
-      <button class="button-40" onclick="gameStart()" role="button">Start</button>
-      
-      <button type="button-40" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-        How to Play
+  <div class="app-container">
+    <!-- Top Bar Controls -->
+    <div class="top-bar">
+      <button class="icon-btn" id="audioToggle" title="Toggle Sound" onclick="toggleBgm()">
+        <i class="fa-solid fa-volume-high" id="audioIcon"></i>
+      </button>
+      <button class="icon-btn" data-bs-toggle="modal" data-bs-target="#howToPlayModal" title="How to Play">
+        <i class="fa-solid fa-circle-question"></i>
       </button>
     </div>
-    <div class="col-3"> 
+
+    <!-- Header -->
+    <header class="game-header">
+      <div class="title-badge">Mathematical Battle Arena</div>
+      <h1 class="game-title">AQUATIC CLASH</h1>
+      <p class="game-subtitle">Strategi Perang Air Galon &bull; Teori Permainan Nim</p>
+    </header>
+
+    <!-- Interactive Pixel Avatar -->
+    <div class="pixel-box">
+      <canvas id="pixelCanvas" width="64" height="64"></canvas>
     </div>
-  
+
+    <!-- Opponent Carousel Section -->
+    <div class="carousel-wrapper">
+      <div class="section-label">Pilih Lawan Bertarung</div>
+
+      <div id="opponentCarousel" class="carousel slide" data-bs-interval="false">
+        <div class="carousel-inner">
+          
+          <!-- Level 1: Cumis -->
+          <div class="carousel-item active" data-lvl="1">
+            <div class="char-card">
+              <div class="avatar-frame">
+                <img src="/image/cumis.jpg" alt="Cumis">
+              </div>
+              <div class="char-info">
+                <h3 class="char-name">Cumis</h3>
+                <div class="char-badges">
+                  <span class="badge-level">LVL 1</span>
+                  <span class="badge-diff diff-easy">Easy</span>
+                </div>
+                <div class="win-rate-box">
+                  <div class="win-rate-label">
+                    <span>Peluang Menang Anda</span>
+                    <span class="win-rate-val">99%</span>
+                  </div>
+                  <div class="win-rate-bar-bg">
+                    <div class="win-rate-bar-fill" style="width: 99%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 2: Patrick Star -->
+          <div class="carousel-item" data-lvl="2">
+            <div class="char-card">
+              <div class="avatar-frame">
+                <img src="/image/pat.png" alt="Patrick Star">
+              </div>
+              <div class="char-info">
+                <h3 class="char-name">Patrick Star</h3>
+                <div class="char-badges">
+                  <span class="badge-level">LVL 2</span>
+                  <span class="badge-diff diff-easy">Easy</span>
+                </div>
+                <div class="win-rate-box">
+                  <div class="win-rate-label">
+                    <span>Peluang Menang Anda</span>
+                    <span class="win-rate-val">95%</span>
+                  </div>
+                  <div class="win-rate-bar-bg">
+                    <div class="win-rate-bar-fill" style="width: 95%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 3: Bot Tolol -->
+          <div class="carousel-item" data-lvl="3">
+            <div class="char-card">
+              <div class="avatar-frame">
+                <img src="/image/bot.jpg" alt="Bot Tolol">
+              </div>
+              <div class="char-info">
+                <h3 class="char-name">Bot Tolol</h3>
+                <div class="char-badges">
+                  <span class="badge-level">LVL 3</span>
+                  <span class="badge-diff diff-easy">Easy</span>
+                </div>
+                <div class="win-rate-box">
+                  <div class="win-rate-label">
+                    <span>Peluang Menang Anda</span>
+                    <span class="win-rate-val">90%</span>
+                  </div>
+                  <div class="win-rate-bar-bg">
+                    <div class="win-rate-bar-fill" style="width: 90%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 4: Riggo Star -->
+          <div class="carousel-item" data-lvl="4">
+            <div class="char-card">
+              <div class="avatar-frame">
+                <img src="/image/bebe.jpg" alt="Riggo Star">
+              </div>
+              <div class="char-info">
+                <h3 class="char-name">Riggo Star</h3>
+                <div class="char-badges">
+                  <span class="badge-level">LVL 4</span>
+                  <span class="badge-diff diff-med">Medium</span>
+                </div>
+                <div class="win-rate-box">
+                  <div class="win-rate-label">
+                    <span>Peluang Menang Anda</span>
+                    <span class="win-rate-val">85%</span>
+                  </div>
+                  <div class="win-rate-bar-bg">
+                    <div class="win-rate-bar-fill" style="width: 85%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 5: Sukuna -->
+          <div class="carousel-item" data-lvl="5">
+            <div class="char-card">
+              <div class="avatar-frame">
+                <img src="/image/sukuna.jpg" alt="Sukuna">
+              </div>
+              <div class="char-info">
+                <h3 class="char-name">Ryomen Sukuna</h3>
+                <div class="char-badges">
+                  <span class="badge-level">LVL 5</span>
+                  <span class="badge-diff diff-med">Hard</span>
+                </div>
+                <div class="win-rate-box">
+                  <div class="win-rate-label">
+                    <span>Peluang Menang Anda</span>
+                    <span class="win-rate-val">60%</span>
+                  </div>
+                  <div class="win-rate-bar-bg">
+                    <div class="win-rate-bar-fill" style="width: 60%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 6: Asauchi -->
+          <div class="carousel-item" data-lvl="6">
+            <div class="char-card">
+              <div class="avatar-frame">
+                <img src="/image/sean.jpg" alt="Asauchi">
+              </div>
+              <div class="char-info">
+                <h3 class="char-name">Asauchi of Kamina</h3>
+                <div class="char-badges">
+                  <span class="badge-level">LVL 6</span>
+                  <span class="badge-diff diff-hard">Expert</span>
+                </div>
+                <div class="win-rate-box">
+                  <div class="win-rate-label">
+                    <span>Peluang Menang Anda</span>
+                    <span class="win-rate-val">1%</span>
+                  </div>
+                  <div class="win-rate-bar-bg">
+                    <div class="win-rate-bar-fill" style="width: 1%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 7: Master MIND -->
+          <div class="carousel-item" data-lvl="7">
+            <div class="char-card">
+              <div class="avatar-frame">
+                <img src="/image/devil.png" alt="Master MIND">
+              </div>
+              <div class="char-info">
+                <h3 class="char-name">Master MIND</h3>
+                <div class="char-badges">
+                  <span class="badge-level">LVL 7</span>
+                  <span class="badge-diff diff-hard">Nightmare</span>
+                </div>
+                <div class="win-rate-box">
+                  <div class="win-rate-label">
+                    <span>Peluang Menang Anda</span>
+                    <span class="win-rate-val">0.1%</span>
+                  </div>
+                  <div class="win-rate-bar-bg">
+                    <div class="win-rate-bar-fill" style="width: 1%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Level 8: GOD OF NIM (NEW) -->
+          <div class="carousel-item" data-lvl="8">
+            <div class="char-card">
+              <div class="avatar-frame" style="background: linear-gradient(135deg, var(--purple-neon), var(--pink-neon));">
+                <img src="/image/god_nim.jpg" alt="Omniscient Nim God">
+              </div>
+              <div class="char-info">
+                <h3 class="char-name" style="background: linear-gradient(90deg, #c084fc, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Nunchi-OS OVERLORD</h3>
+                <div class="char-badges">
+                  <span class="badge-level" style="border-color: var(--purple-neon); color: #e9d5ff;">LVL 8</span>
+                  <span class="badge-diff diff-god">IMPOSSIBLE &bull; NUNCHI</span>
+                </div>
+                <div class="win-rate-box" style="border-color: rgba(168, 85, 247, 0.3);">
+                  <div class="win-rate-label">
+                    <span>Peluang Menang Anda</span>
+                    <span class="win-rate-val" style="color: #f472b6;">0.00%</span>
+                  </div>
+                  <div class="win-rate-bar-bg">
+                    <div class="win-rate-bar-fill" style="width: 0%; background: #f472b6;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Carousel Nav Buttons -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#opponentCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#opponentCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn-cyber-primary" onclick="gameStart()">
+        <i class="fa-solid fa-play"></i> Mulai Bertanding
+      </button>
+      <button class="btn-cyber-secondary" data-bs-toggle="modal" data-bs-target="#howToPlayModal">
+        <i class="fa-solid fa-book-open"></i> Cara Bermain
+      </button>
+    </div>
   </div>
 
-  <!-- jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-  <!-- Bootstrap Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
-  
-  <script src="script.js"></script>
-</body>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="examplemodal1">Cara main</h1>
-        
-      </div>
-      <div class="modal-body">
-        - Ada 3 buah ember berisi air 
-        - Secara bergantian anda akan mengambil air dari 1 buah ember dengan jumlah yang bebas
-        - anda tidak boleh mengambil dari 2 atau lebih ember pada saat giliran berlangsung
-
-        - Player yang mengambil Air terakhir , dinyatakan menang
-        - Player yang tidak bisa mengambil air lagi dikarenakan bucket berisi 0 Liter pada ketiga galon 
-        - Player yang tidak bisa mengambil air lagi, dinyatakan kalah
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+  <!-- How to Play Modal -->
+  <div class="modal fade" id="howToPlayModal" tabindex="-1" aria-labelledby="howToPlayLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="howToPlayLabel">
+            <i class="fa-solid fa-water"></i> Panduan Aquatic Clash
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-rule-item">
+            <div class="rule-num">1</div>
+            <div>Terdapat <strong>3 ember / galon air</strong> dengan isi acak di arena pertandingan.</div>
+          </div>
+          <div class="modal-rule-item">
+            <div class="rule-num">2</div>
+            <div>Pada giliran Anda, pilih <strong>hanya 1 galon</strong> lalu tentukan jumlah air yang ingin dikurangi (minimal 1 liter, maksimal habis).</div>
+          </div>
+          <div class="modal-rule-item">
+            <div class="rule-num">3</div>
+            <div>Dilarang mengambil air dari lebih dari 1 galon dalam satu giliran yang sama.</div>
+          </div>
+          <div class="modal-rule-item">
+            <div class="rule-num">4</div>
+            <div><strong>Pemenang Mutlak:</strong> Pemain yang mengambil tetes air terakhir hingga seluruh galon kosong keluar sebagai pemenang!</div>
+          </div>
+          <div class="modal-rule-item">
+            <div class="rule-num">&infin;</div>
+            <div><em>Tips:</em> Di Level 8, bot menggunakan algoritma murni <strong>NUNCHI</strong> matematika. Jika Anda melakukan kesalahan satu langkah saja, bot tidak akan pernah memberi ampun!</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cyber-primary" data-bs-dismiss="modal">Saya Siap Bertarung</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
-</html>
 
-<script>
-  // A $( document ).ready() block.
-  const mySelector = {
-    level:-1,
-    start: false
-  }
+  <!-- Hidden audio element for preview/BGM if needed -->
+  <audio id="menuAudio" src="/bgm/sukuna_ost.mp3" loop></audio>
 
- function select(id,lvl){
-  $('.customcard').removeClass('customcardselected');
-  $(`#${id}`).addClass('customcardselected');
-  mySelector.level = lvl
- }
+  <!-- jQuery & Bootstrap -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/script.js"></script>
 
- function gameStart(){
-  id = $(".active").prop("id")
-  lvl = parseInt(id)
-  mySelector.level = lvl
-  mySelector.start = true
-    if (mySelector.level == -1) {
-      alert("Choose your fuckn enemy")
-      return
-    } else {
-      location.href = `/game/${mySelector.level}`
+  <script>
+    // Canvas animation
+    let moodState = 0;
+    setInterval(() => {
+      if (moodState === 0) {
+        drawPixelArt("angry");
+        moodState = 1;
+      } else {
+        drawPixelArt("smile");
+        moodState = 0;
+      }
+    }, 1200);
+
+    // Audio toggle
+    let isAudioPlaying = false;
+    const menuAudio = document.getElementById('menuAudio');
+    const audioIcon = document.getElementById('audioIcon');
+
+    function toggleBgm() {
+      if (isAudioPlaying) {
+        menuAudio.pause();
+        audioIcon.className = 'fa-solid fa-volume-xmark';
+        isAudioPlaying = false;
+      } else {
+        menuAudio.volume = 0.25;
+        menuAudio.play().then(() => {
+          audioIcon.className = 'fa-solid fa-volume-high';
+          isAudioPlaying = true;
+        }).catch(() => {
+          // Autoplay policy prevented playback
+        });
+      }
     }
- }
-</script>
+
+    // Start Game based on active carousel item
+    function gameStart() {
+      const activeItem = document.querySelector('#opponentCarousel .carousel-item.active');
+      const lvl = activeItem ? activeItem.getAttribute('data-lvl') : 1;
+      window.location.href = `/game/${lvl}`;
+    }
+  </script>
+</body>
+</html>
