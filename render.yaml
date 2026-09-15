@@ -1,0 +1,16 @@
+# Exported from Render on 2026-09-15T13:06:50Z
+version: "1"
+projects:
+- name: My project
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: Aquatic-Clash
+      runtime: node
+      repo: https://github.com/seanmantanhacker/Aquatic-Clash
+      plan: free
+      region: singapore
+      buildCommand: npm install
+      startCommand: npm start
+      autoDeployTrigger: commit
